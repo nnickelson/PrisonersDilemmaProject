@@ -11,13 +11,13 @@ namespace PrisonersDilemmaProject
         static void Main(string[] args)
         {
             int Players = 6;
+            int Turns = 5;
 
-            GameSetup GamePrep = new GameSetup(Players);
-            GamePlay Game = new GamePlay();
+            GamePlay PlayGame = new GamePlay(new Game(Turns, Players));
 
-            Game.RunGame(8, GamePrep.PlayerList);
+            PlayGame.RunGame();
 
-            foreach (Player player in GamePrep.PlayerList)
+            foreach (Player player in PlayGame.RPDGame.PlayerList)
             {
                 //Console.WriteLine("player: " + GamePrep.PlayerList.IndexOf(player) + "------" + player.StrategyType);
                 foreach(var item in player.StoredPayoffResults)
