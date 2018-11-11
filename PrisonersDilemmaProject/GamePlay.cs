@@ -13,96 +13,63 @@ namespace PrisonersDilemmaProject
         public GamePlay(Game game)
         {
             this.RPDGame = game;
-            Console.WriteLine("Turns = " + RPDGame.Turns + "   players = " + RPDGame.NumPlayers);
+            Console.WriteLine("Turns = " + RPDGame.NumTurns + "   players = " + RPDGame.NumPlayers);
         }
 
         public void RunGame()
         {
-            for (int i = 0; i < RPDGame.Turns; i++)
+            for (int i = 0; i < RPDGame.NumTurns; i++)
             {
-                SimulateRound();
+                SimulateRound(i);
             }
+            RoundResults();
         }
-        public void SimulateRound()
+        public void SimulateRound(int turn)
         {
-            foreach (Player p in RPDGame.PlayerList)
-            {
-                p.StoredPlayerChoices.Add(new int[RPDGame.PlayerList.Count]);
-                p.StoredOpponentChoices.Add(new int[RPDGame.PlayerList.Count]);
-                p.StoredPayoffResults.Add(new int[RPDGame.PlayerList.Count]);
-            }
-            int turn = RPDGame.PlayerList[0].StoredPlayerChoices.Count - 1;
-            Console.WriteLine("Turn = " + (turn + 1));
+            Game.Turn = turn;
             for (int i = 0; i < RPDGame.PlayerList.Count(); i++)
             {
 
-                RPDGame.PlayerList[i].StoredPayoffResults[turn][i] = 0;
-                RPDGame.PlayerList[i].StoredPlayerChoices[turn][i] = 0;
-                for (int j = i+1; j< RPDGame.PlayerList.Count(); j++)
+                Game.TurnPlayerPayoffs[turn, i, i] = 0;
+                Game.TurnPlayerChoices[turn, i, i] = 0;
+                for (int j = i+1; j< RPDGame.NumPlayers; j++)
                 {
-                    RPDGame.PlayerList[i].StoredPlayerChoices[turn][j] = Strategies.ReturnStrategy(RPDGame.PlayerList, RPDGame.PlayerList[i].StrategyType, i, j);
-                    RPDGame.PlayerList[j].StoredPlayerChoices[turn][i] = Strategies.ReturnStrategy(RPDGame.PlayerList, RPDGame.PlayerList[j].StrategyType, j, i);
+                    Game.TurnPlayerChoices[turn,i,j] = Strategies.ReturnStrategy(RPDGame.PlayerList[i].StrategyType, i, j);
+                    Game.TurnPlayerChoices[turn,j,i] = Strategies.ReturnStrategy(RPDGame.PlayerList[j].StrategyType, j, i);
+                    int cPlayer = Game.TurnPlayerChoices[turn, i, j];
+                    int oPlayer = Game.TurnPlayerChoices[turn, j, i];
+                    
 
-                    int cPlayer = RPDGame.PlayerList[i].StoredPlayerChoices[turn][j];
-                    int oPlayer = RPDGame.PlayerList[j].StoredPlayerChoices[turn][i];
-
-                    //Console.WriteLine("current player = " + i + " " + cPlayer);
-                    //Console.WriteLine("opposing player = " + oPlayer);
-
-                    RPDGame.PlayerList[i].StoredOpponentChoices[turn][j] = oPlayer;
-                    RPDGame.PlayerList[j].StoredOpponentChoices[turn][i] = cPlayer;
-
-                    RPDGame.PlayerList[i].StoredPayoffResults[turn][j] = 
-                        Game.PayoutMatrix[cPlayer, oPlayer, 0];
-
-                    RPDGame.PlayerList[j].StoredPayoffResults[turn][i] = 
-                        Game.PayoutMatrix[cPlayer, oPlayer, 1];
-
-                    RPDGame.PlayerList[i].OpponentStrategy[j] = RPDGame.PlayerList[j].StrategyType;
-                    RPDGame.PlayerList[j].OpponentStrategy[i] = RPDGame.PlayerList[i].StrategyType;
+                    Game.TurnPlayerPayoffs[turn,i,j] = Game.PayoutMatrix[cPlayer, oPlayer, 0];
+                    Game.TurnPlayerPayoffs[turn,j,i] = Game.PayoutMatrix[cPlayer, oPlayer, 1];
                     
                 }
-            }
-            int m = 0;
-            foreach (Player player in RPDGame.PlayerList)
+            }  
+        }
+
+        public void RoundResults()
+        {
+            for (int i = 0; i < RPDGame.NumTurns; i++)
             {
-                Console.Write("{0,-20}", player.StrategyName );
-                int n = 0;
-                foreach (int num in player.StoredPayoffResults[turn])
+                Console.WriteLine("Turn: " + i);
+                for (int j = 0; j < RPDGame.NumPlayers; j++)
                 {
-                    //Console.WriteLine("m,n = "+ m + "  " + n);
-                    if (m != n)
+                    Console.Write(String.Format("{0,15}", RPDGame.PlayerList[j].StrategyName));
+                    for (int k = 0; k < RPDGame.NumPlayers; k++)
                     {
-                        Console.Write("{0,-17} {1,2:N1}  ", Player.StratName[player.OpponentStrategy[n]], num);
-                    }
-                    else
-                    {
-                        Console.Write("{0,-23}", ("XXXXXXXXXXXXXXXXXXXXXX"));
-                    }
-                    n++;
-                }
-                Console.WriteLine();
-                
-                player.TotalRoundPayoff.Add(player.PayoffPerPlayer.Sum());
-                m++;
-            }
-            Console.WriteLine();
-          
-            for (int x = 0; x < RPDGame.PlayerList.Count; x++)
-            {
-                for (int y = 0; y < RPDGame.PlayerList[x].StoredPlayerChoices.Count; y++)
-                {
-                    //Console.WriteLine("length = " + players[x].StoredPlayerChoices[y].Length);
-                    for (int z = 0; z < RPDGame.PlayerList[x].StoredPlayerChoices[y].Length; z++)
-                    {
-                        //Console.Write("   y = " + y + "    ");
-                        //Console.Write("   z = " + z + "    ");
-                        Console.Write(RPDGame.PlayerList[x].StoredPlayerChoices[y][z]);
+                        if (k != j)
+                        {
+                            Console.Write(String.Format("{0,15} {1,2}  ", (RPDGame.PlayerList[k].StrategyName), (Game.TurnPlayerPayoffs[i, j, k])));
+                        }
+                        else
+                        {
+                            Console.Write(String.Format("{0,20}", "XXXXXXXX   "));
+                        }
                     }
                     Console.WriteLine();
                 }
-                Console.WriteLine();
             }
+            Console.WriteLine();
         }
     }
 }
