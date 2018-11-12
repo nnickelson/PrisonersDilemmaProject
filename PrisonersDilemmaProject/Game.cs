@@ -20,8 +20,8 @@ namespace PrisonersDilemmaProject
         public static int[,,] TurnPlayerPayoffs { get; set; }
         public static int Turn = 0;
 
-        public int NumPlayers { get; set; }
-        public int NumTurns { get; set; }
+        public static int NumPlayers { get; set; }
+        public static int NumTurns { get; set; }
         public List<Player> PlayerList { get; set; }
        
         //payoff numbers
@@ -30,14 +30,11 @@ namespace PrisonersDilemmaProject
         private int R = 3;
         private int P = 1;
 
-
-       
-
         public Game(int turns, int players)
         {
             this.PlayerList = new List<Player>();
-            this.NumPlayers = players;
-            this.NumTurns = turns;
+            NumPlayers = players;
+            NumTurns = turns;
             setTestPlayers();
             setRandomPlayers();
 
@@ -50,11 +47,11 @@ namespace PrisonersDilemmaProject
 
         private void setTestPlayers()
         {
-            PlayerList.Add(new Player(9));
+            PlayerList.Add(new Player(0));
             PlayerList.Add(new Player(1));
-            PlayerList.Add(new Player(2));
-            PlayerList.Add(new Player(4));
             PlayerList.Add(new Player(3));
+            PlayerList.Add(new Player(9));
+            PlayerList.Add(new Player(5));
         }
 
         private void setRandomPlayers()

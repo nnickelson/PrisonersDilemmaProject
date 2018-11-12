@@ -13,7 +13,7 @@ namespace PrisonersDilemmaProject
 {
     static class Strategies
     {
-        public static int ReturnStrategy(int strategy, int player, int opponent)
+        public static int ReturnStrategy(int strategy, int player, int opponent, List<Player> pList)
         {
             int strat = 0;
             switch (strategy)
@@ -34,7 +34,7 @@ namespace PrisonersDilemmaProject
                     strat = TitForTat3(player, opponent);
                     break;
                 case 5:
-                    strat = Cheater1(player, opponent);
+                    strat = Cheater1(player, opponent, pList);
                     break;
                 case 6:
                     strat = Cheater2(player, opponent);
@@ -58,13 +58,13 @@ namespace PrisonersDilemmaProject
             return 1;
         }
 
-        //Strategy 2 - Always Cooperate
+        //Strategy 1 - Always Cooperate
         private static int AlwaysCooperate()
         {
             return 0;
         }
 
-        //Strategy 3 - TitforTat1: player defects next turn after opponent's 1st defect, else they cooperate
+        //Strategy 2 - TitforTat1: player defects next turn after opponent's 1st defect, else they cooperate
         private static int TitForTat1(int player, int opponent)
         {
             if (Game.Turn > 0)
@@ -75,64 +75,68 @@ namespace PrisonersDilemmaProject
             return 0;
         }
 
-        //Strategy 4 - TitforTat2: player defects next turn after opponent's 2nd consecutive defect, else they cooperate
+        //Strategy 3 - TitforTat2: player defects next turn after opponent's 2nd consecutive defect, else they cooperate
         private static int TitForTat2(int player, int opponent)
         {
             if (Game.Turn > 1)
-            {
                 if (Game.TurnPlayerChoices[Game.Turn - 1, opponent, player] == 1 &&
                         Game.TurnPlayerChoices[Game.Turn - 2, opponent, player] == 1) 
-                {
                     return 1;
-                }
-            }
             return 0;
         }
 
-        //Strategy 5 - TitForTat3: player defects next turn after opponent's 3rd consecutive defect, else they cooperate
+        //Strategy 4 - TitForTat3: player defects next turn after opponent's 3rd consecutive defect, else they cooperate
         private static int TitForTat3(int player, int opponent)
         {
             if (Game.Turn > 2)
-            {
                 if (Game.TurnPlayerChoices[Game.Turn - 1, opponent, player] == 1 &&
                         Game.TurnPlayerChoices[Game.Turn - 2, opponent, player] == 1 &&
                         Game.TurnPlayerChoices[Game.Turn - 3, opponent, player] == 1) 
-                {
                     return 1;
-                }
-            }
             return 0;
         }
 
-        //Incomplete
-        private static int Cheater1(int player, int opponent)
+        // Strategy 5 - Cheater1 : Tries to defect one time and checks for retaliation
+        // If there is retaliation, the player will try to cooperate
+        // If cooperation fails, then fallabck to defection as a last resort
+        private static int Cheater1(int player, int opponent, List<Player> pList)
         {
+            int rtValue = 0;
+            if (Game.Turn == 0)
+            {
+                pList[player].playerCheck1[opponent] = 0;
+                pList[player].playerCheck2[opponent] = 0;
+            }
+            if (Game.Turn > 0 && pList[player].playerCheck1[opponent] == 0)
+            {
+                int num = checkLastNTurns(player, opponent, 3);
+                if (pList[player].playerCheck2[opponent] == 0)
+                    pList[player].playerCheck2[opponent] = num;
+                else
+                    pList[player].playerCheck2[opponent] = 2;
+            }
             if (Game.Turn > 0)
             {
-                int lChoice = Game.TurnPlayerChoices[Game.Turn-1, player, opponent];
-                if (lChoice == 1)
+                int num = pList[player].playerCheck2[opponent];
+                if (num == 0)
                 {
-                    Console.WriteLine("last pick defect, this pick coop");
-                    return 0;
+                    if (pList[player].playerCheck1[opponent] == 0)  rtValue = 0; 
+                    if (pList[player].playerCheck1[opponent] == 1)  rtValue = 1; 
+                    if (pList[player].playerCheck1[opponent] == 2)  rtValue = 0; 
                 }
-                else
-                {
-                    for (int i = Game.Turn -1; i > -1; i--)
-                    {
-                        //testing testing
-                    }
-                }
+                if (num == 1)  rtValue = 0;   
+                if (num == 2)  rtValue = 1; 
             }
-            return 0;
+            pList[player].playerCheck1[opponent] = (pList[player].playerCheck1[opponent] + 1) % 3;
+            return rtValue;
         }
 
-        //Incomplete
+        // Strategy 6 - Incomplete
         private static int Cheater2(int player, int opponent)
         {
             return 0;
         }
-
-        //Incomplete
+        // Strategy 7 - Incomplete
         private static int Cheater3(int player, int opponent)
         {
             return 0;
@@ -142,27 +146,29 @@ namespace PrisonersDilemmaProject
         private static int PermanentRetaliation(int player, int opponent)
         {
             if (Game.Turn > 0)
-            {
-                if (Game.TurnPlayerChoices[Game.Turn - 1, player, opponent] == 1)
-                {
+                if (Game.TurnPlayerChoices[Game.Turn - 1, player, opponent] == 1) 
                     return 1;
-                }
-                else if (Game.TurnPlayerChoices[Game.Turn-1, opponent, player] == 1)
-                {
+                else if (Game.TurnPlayerChoices[Game.Turn - 1, opponent, player] == 1) 
                     return 1;
-                }
-                
-            }
             return 0;
         }
 
         // Strategy 9 - Random Selection: Randomly chooses to defect or cooperate
         private static int Random(int player, int opponent)
         {
-
             int rnd = Player.r.Next(0, 2);
-            Console.WriteLine(rnd);
+            //Console.WriteLine(rnd);
             return rnd;
+        }
+
+
+        // Check last N turns for defection
+        private static int checkLastNTurns(int player, int opponent, int turns)
+        {
+            for (int i = Game.Turn - 1; i > Game.Turn - 1 - turns; i--)
+                if (Game.TurnPlayerChoices[i,opponent,player] == 1)
+                    return 1;
+            return 0;
         }
     }
 }

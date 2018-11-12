@@ -11,7 +11,7 @@ namespace PrisonersDilemmaProject
         static void Main(string[] args)
         {
             int Players = 5;
-            int Turns = 5;
+            int Turns = 10;
 
             GamePlay PlayGame = new GamePlay(new Game(Turns, Players));
             //Console.WriteLine(Game.PayoutMatrix[])

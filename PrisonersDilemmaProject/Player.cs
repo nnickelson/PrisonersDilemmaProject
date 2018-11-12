@@ -13,12 +13,16 @@ namespace PrisonersDilemmaProject
             "Cheater 1", "Cheater 2", "Cheater 3", "P Retaliation", "Random"};
         public string StrategyName { get; set; }
         public static Random r = new Random();
+        public int[] playerCheck1;
+        public int[] playerCheck2;
 
 
         public Player(int strat)
         {
             this.StrategyType = strat;
             this.StrategyName = StratName[strat];
+            this.playerCheck1 = new int[Game.NumPlayers];
+            this.playerCheck2 = new int[Game.NumPlayers];
         }
     }
 }
