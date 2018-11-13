@@ -10,14 +10,18 @@ namespace PrisonersDilemmaProject
     {
         static void Main(string[] args)
         {
-            int Players = 5;
-            int Turns = 10;
+            int games = 20;
+            int Players = 100;
+            int Turns = 100;
 
-            GamePlay PlayGame = new GamePlay(new Game(Turns, Players));
-            //Console.WriteLine(Game.PayoutMatrix[])
+            for (int i = 0; i < games; i++)
+            {
+                Console.WriteLine("GAME: " + (i + 1));
+                GamePlay PlayGame = new GamePlay(new Game(Turns, Players));
+                //Console.WriteLine(Game.PayoutMatrix[])
 
-            PlayGame.RunGame();
-
+                PlayGame.RunGame();
+            }
             Console.ReadKey();
         }
     }

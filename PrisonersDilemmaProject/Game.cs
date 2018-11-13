@@ -23,6 +23,7 @@ namespace PrisonersDilemmaProject
         public static int NumPlayers { get; set; }
         public static int NumTurns { get; set; }
         public List<Player> PlayerList { get; set; }
+        public Random rnd = new Random();
        
         //payoff numbers
         private int S = 0;
@@ -36,12 +37,15 @@ namespace PrisonersDilemmaProject
             NumPlayers = players;
             NumTurns = turns;
             setTestPlayers();
-            setRandomPlayers();
+            setRandomPlayers(players);
 
             PayoutMatrix = new int[,,] { { { R, R }, { S, T } },
                                          { { T, S }, { P, P } } };
             TurnPlayerChoices = new int[turns, players, players];
-            TurnPlayerPayoffs = new int[turns, players, players];
+            TurnPlayerPayoffs = new int[turns, players, players + 1];
+            for (int i = 0; i < turns; i++)
+                for (int j = 0; j < players; j++) 
+                    TurnPlayerPayoffs[i, j, players] = 0;
 
         }
 
@@ -49,13 +53,24 @@ namespace PrisonersDilemmaProject
         {
             PlayerList.Add(new Player(0));
             PlayerList.Add(new Player(1));
+            PlayerList.Add(new Player(2));
             PlayerList.Add(new Player(3));
-            PlayerList.Add(new Player(9));
+            PlayerList.Add(new Player(4));
             PlayerList.Add(new Player(5));
+            PlayerList.Add(new Player(6));
+            PlayerList.Add(new Player(7));
+            PlayerList.Add(new Player(8));
+            PlayerList.Add(new Player(9));
+            PlayerList.Add(new Player(10));
         }
 
-        private void setRandomPlayers()
+        private void setRandomPlayers(int players)
         {
+            int rndPlayers = players - PlayerList.Count();
+            for (int i = 0; i < rndPlayers; i++) 
+            {
+                PlayerList.Add(new Player(this.rnd.Next(2, 11)));
+            }
             return;
             //while (this.PlayerList.Count() < this.NumPlayers)
             //{

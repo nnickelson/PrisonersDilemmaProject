@@ -37,16 +37,19 @@ namespace PrisonersDilemmaProject
                     strat = Cheater1(player, opponent, pList);
                     break;
                 case 6:
-                    strat = Cheater2(player, opponent);
+                    strat = Cheater2(player, opponent, pList);
                     break;
                 case 7:
-                    strat = Cheater3(player, opponent);
+                    strat = Cheater3(player, opponent, pList);
                     break;
                 case 8:
                     strat = PermanentRetaliation(player, opponent);
                     break;
                 case 9:
                     strat = Random(player, opponent);
+                    break;
+                case 10:
+                    strat = Conditional(player, opponent);
                     break;
             }
             return strat;
@@ -132,14 +135,71 @@ namespace PrisonersDilemmaProject
         }
 
         // Strategy 6 - Incomplete
-        private static int Cheater2(int player, int opponent)
+        private static int Cheater2(int player, int opponent, List<Player> pList)
         {
-            return 0;
+            int rtValue = 0;
+            if (Game.Turn == 0)
+            {
+                pList[player].playerCheck1[opponent] = 0;
+                pList[player].playerCheck2[opponent] = 0;
+            }
+            if (Game.Turn > 0 && pList[player].playerCheck1[opponent] == 0)
+            {
+                int num = checkLastNTurns(player, opponent, 4);
+                if (pList[player].playerCheck2[opponent] == 0)
+                    pList[player].playerCheck2[opponent] = num;
+                else
+                    pList[player].playerCheck2[opponent] = 2;
+            }
+            if (Game.Turn > 0)
+            {
+                int num = pList[player].playerCheck2[opponent];
+                if (num == 0)
+                {
+                    if (pList[player].playerCheck1[opponent] == 0) rtValue = 0;
+                    if (pList[player].playerCheck1[opponent] == 1) rtValue = 1;
+                    if (pList[player].playerCheck1[opponent] == 2) rtValue = 1;
+                    if (pList[player].playerCheck1[opponent] == 3) rtValue = 0;
+                }
+                if (num == 1) rtValue = 0;
+                if (num == 2) rtValue = 1;
+            }
+            pList[player].playerCheck1[opponent] = (pList[player].playerCheck1[opponent] + 1) % 4;
+            return rtValue;
         }
         // Strategy 7 - Incomplete
-        private static int Cheater3(int player, int opponent)
+        private static int Cheater3(int player, int opponent, List<Player> pList)
         {
-            return 0;
+            int rtValue = 0;
+            if (Game.Turn == 0)
+            {
+                pList[player].playerCheck1[opponent] = 0;
+                pList[player].playerCheck2[opponent] = 0;
+            }
+            if (Game.Turn > 0 && pList[player].playerCheck1[opponent] == 0)
+            {
+                int num = checkLastNTurns(player, opponent, 5);
+                if (pList[player].playerCheck2[opponent] == 0)
+                    pList[player].playerCheck2[opponent] = num;
+                else
+                    pList[player].playerCheck2[opponent] = 2;
+            }
+            if (Game.Turn > 0)
+            {
+                int num = pList[player].playerCheck2[opponent];
+                if (num == 0)
+                {
+                    if (pList[player].playerCheck1[opponent] == 0) rtValue = 0;
+                    if (pList[player].playerCheck1[opponent] == 1) rtValue = 1;
+                    if (pList[player].playerCheck1[opponent] == 2) rtValue = 1;
+                    if (pList[player].playerCheck1[opponent] == 3) rtValue = 1;
+                    if (pList[player].playerCheck1[opponent] == 4) rtValue = 0;
+                }
+                if (num == 1) rtValue = 0;
+                if (num == 2) rtValue = 1;
+            }
+            pList[player].playerCheck1[opponent] = (pList[player].playerCheck1[opponent] + 1) % 5;
+            return rtValue;
         }
 
         // Strategy 8 - Permanent Retaliation: after first opponent's defect, player will always defect 
@@ -159,6 +219,54 @@ namespace PrisonersDilemmaProject
             int rnd = Player.r.Next(0, 2);
             //Console.WriteLine(rnd);
             return rnd;
+        }
+
+        //Strategy 10 - Conditional Probability
+        private static int Conditional(int player, int opponent)
+        {
+            if (Game.Turn < 2) return 0;
+            int totalC = 0;
+            int totalD = 0;
+            int numC_afterC = 0;
+            int numD_afterC = 0;
+            int numC_afterD = 0;
+            int numD_afterD = 0;
+            for (int i = 0; i < Game.Turn - 1; i++)
+            {
+                for (int j = 0; j < Game.NumPlayers; j++)
+                {
+                    if (j == opponent) continue;
+                    if (Game.TurnPlayerChoices[i, j, opponent] == 0)
+                    {
+                        if (Game.TurnPlayerChoices[i + 1, opponent, j] == 0)
+                            numC_afterC++;
+                        else
+                            numD_afterC++;
+                        totalC++;
+
+                    }
+                    if (Game.TurnPlayerChoices[i, j, opponent] == 1)
+                    {
+                        if (Game.TurnPlayerChoices[i + 1, opponent, j] == 0)
+                            numC_afterD++;
+                        else
+                            numD_afterD++;
+                        totalD++;
+                    }
+                }
+            }
+            //Console.WriteLine("Opponent " + "  " + opponent + " percentages");
+            //Console.WriteLine("Coop after Coop = " + (numC_afterC * 100.0 / totalC));
+            //Console.WriteLine("Def after Coop = " + (numD_afterC * 100.0 / totalC));
+            //Console.WriteLine("Coop after Def = " + (numC_afterD * 100.0 / totalD));
+            //Console.WriteLine("Def after Def = " + (numD_afterD * 100.0 / totalD));
+            //Console.WriteLine("--------------------------------------------------");
+            
+            if (totalD != 0)
+                if (numC_afterD*1.0 / totalD > 0.5) return 1;
+            if (totalC != 0)
+                if (numD_afterC*1.0 / totalC > 0.5) return 1;
+            return 0;
         }
 
 
