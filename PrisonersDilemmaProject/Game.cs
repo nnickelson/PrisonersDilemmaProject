@@ -69,7 +69,7 @@ namespace PrisonersDilemmaProject
             int rndPlayers = players - PlayerList.Count();
             for (int i = 0; i < rndPlayers; i++) 
             {
-                PlayerList.Add(new Player(this.rnd.Next(2, 11)));
+                PlayerList.Add(new Player(this.rnd.Next(2, 8)));
             }
             return;
             //while (this.PlayerList.Count() < this.NumPlayers)

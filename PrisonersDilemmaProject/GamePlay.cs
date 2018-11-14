@@ -59,38 +59,19 @@ namespace PrisonersDilemmaProject
         }
 
         public void RoundResults()
-        {   /*
-            for (int i = 0; i < Game.NumTurns; i++)
-            {
-                Console.WriteLine("Turn: " + i);
-                for (int j = 0; j < Game.NumPlayers; j++)
-                {
-                    Console.Write(String.Format("{0,15}", RPDGame.PlayerList[j].StrategyName));
-                    for (int k = 0; k < Game.NumPlayers; k++)
-                    {
-                        if (k != j)
-                        {
-                            Console.Write(String.Format("{0,15} {1,2}  ", (RPDGame.PlayerList[k].StrategyName), (Game.TurnPlayerPayoffs[i, j, k])));
-                        }
-                        else
-                        {
-                            Console.Write(String.Format("{0,20}", "XXXXXXXX   "));
-                        }
-                    }
-                    Console.Write(String.Format("Total = {0,3}", Game.TurnPlayerPayoffs[i, j, Game.NumPlayers]));
-                    Console.WriteLine();
-                }
-            }*/
-            //Console.WriteLine();
-            //Console.WriteLine();
+        {   
             int []maxNum = new int[6];
             int []minNum = new int[6];
             int []maxPlayer = new int[6];
             int []minPlayer = new int[6];
             double[] Strats = new double[11];
+            int[] allScores = new int[Game.NumPlayers];
+            int[] allPlayers = new int[Game.NumPlayers];
             
             for (int k = 0; k < Game.NumPlayers; k++)
             {
+                allScores[k] = RPDGame.PlayerList[k].totalPayoff;
+                allPlayers[k] = k;
                 if (k < 5)
                 {
                     maxNum[k] = RPDGame.PlayerList[k].totalPayoff;
@@ -129,9 +110,10 @@ namespace PrisonersDilemmaProject
                 Console.WriteLine("Place " + (i + 1) + " Player: " + maxPlayer[i] + 
                     " " + RPDGame.PlayerList[maxPlayer[i]].StrategyName + "   Total: " + maxNum[i]);
             }
+            double[] numStrats = new double[11];
             for (int x = 0; x < 11; x++)
             {
-                //Console.WriteLine(Strats[x]);
+                numStrats[x] = Strats[x];
                 Strats[x] = Strats[x] / Game.NumPlayers;
             }
             Console.WriteLine("Strats proportions: ");
@@ -140,6 +122,48 @@ namespace PrisonersDilemmaProject
                 Console.WriteLine(Player.StratName[y] + ": " + Strats[y] + "  ");
             }
             Console.WriteLine();Console.WriteLine();
+            sortAllPlayers(allPlayers, allScores, numStrats);
+            Console.WriteLine();
+        }
+
+        public void sortAllPlayers(int[]player, int[] score, double[] strats)
+        {
+            int[] places = new int[11];
+            for (int i = 0; i < Game.NumPlayers-1; i++)
+            {
+                for (int j = i + 1; j < Game.NumPlayers; j++)
+                {
+                    if (score[j] < score[i])
+                    {
+                        int t = player[j];
+                        player[j] = player[i];
+                        player[i] = t;
+                        t = score[j];
+                        score[j] = score[i];
+                        score[i] = t;
+                    }
+                } 
+            }
+            
+            foreach (int w in player)
+            {
+                Console.WriteLine("Player " + w + " " + RPDGame.PlayerList[w].StrategyName + " score = " 
+                    + RPDGame.PlayerList[w].totalPayoff);
+            }
+            Console.WriteLine("########################################");
+            for (int a = 0; a < Game.NumPlayers; a++)
+            {
+                //Console.WriteLine("stratType =" + RPDGame.PlayerList[a].StrategyType);
+                //Console.WriteLine("a = " + a);
+                places[RPDGame.PlayerList[player[a]].StrategyType]
+                    = places[RPDGame.PlayerList[player[a]].StrategyType] + a;
+            }
+            for (int b = 0; b < 11; b++)
+            {
+                //Console.WriteLine("Places = " + places[b] + "  No strats = " + strats[b]);
+                Console.WriteLine(Player.StratName[b] + " average placement: " + places[b]/strats[b]);
+            }
+            Console.WriteLine("-------------------------");
         }
     }
 }
