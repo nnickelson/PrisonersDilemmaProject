@@ -18,6 +18,8 @@ namespace PrisonersDilemmaProject
         // Stored all player winnings earned during a game. size = [#turns][#players][#players]
         // calling: TurnPlayerPayoffs[turn #][amount active player won][opponent]
         public static int[,,] TurnPlayerPayoffs { get; set; }
+
+
         public static int Turn = 0;
 
         public static int NumPlayers { get; set; }
@@ -49,6 +51,7 @@ namespace PrisonersDilemmaProject
 
         }
 
+        //sets the list of players participating in all tournaments
         private void setTestPlayers()
         {
             PlayerList.Add(new Player(0));
@@ -64,6 +67,7 @@ namespace PrisonersDilemmaProject
             PlayerList.Add(new Player(10));
         }
 
+        //Fills the rest of the player list with randomly selected strategies
         private void setRandomPlayers(int players)
         {
             int rndPlayers = players - PlayerList.Count();
@@ -72,10 +76,6 @@ namespace PrisonersDilemmaProject
                 PlayerList.Add(new Player(this.rnd.Next(2, 8)));
             }
             return;
-            //while (this.PlayerList.Count() < this.NumPlayers)
-            //{
-            //    Console.WriteLine("stuff");
-            //}
         }
     }
 }

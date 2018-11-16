@@ -134,7 +134,10 @@ namespace PrisonersDilemmaProject
             return rtValue;
         }
 
-        // Strategy 6 - Incomplete
+        // Strategy 6 - Cheater 2
+        // tries to defect on a player 2 times in a row without being defected on
+        // if successful, will try again
+        // if not will go to cooperate, and if that is unsuccessful then goes to always defect
         private static int Cheater2(int player, int opponent, List<Player> pList)
         {
             int rtValue = 0;
@@ -167,7 +170,10 @@ namespace PrisonersDilemmaProject
             pList[player].playerCheck1[opponent] = (pList[player].playerCheck1[opponent] + 1) % 4;
             return rtValue;
         }
-        // Strategy 7 - Incomplete
+        // Strategy 7 - Cheater 3
+        // tries to defect on a player 3 times in a row without being defected on
+        // if successful, will try again
+        // if not will go to cooperate, and if that is unsuccessful then goes to always defect
         private static int Cheater3(int player, int opponent, List<Player> pList)
         {
             int rtValue = 0;
@@ -222,6 +228,11 @@ namespace PrisonersDilemmaProject
         }
 
         //Strategy 10 - Conditional Probability
+        // if the probability from the opponent's previous moves say that a player
+        // has a better than 50% of opponent NOT defecting next turn if player defects, player will defect
+        // if the probability says there is more than 50% probability opponent will defect next turn
+        // if player cooperates, player will also defect
+        // else player cooperates 
         private static int Conditional(int player, int opponent)
         {
             if (Game.Turn < 2) return 0;
@@ -255,12 +266,6 @@ namespace PrisonersDilemmaProject
                     }
                 }
             }
-            //Console.WriteLine("Opponent " + "  " + opponent + " percentages");
-            //Console.WriteLine("Coop after Coop = " + (numC_afterC * 100.0 / totalC));
-            //Console.WriteLine("Def after Coop = " + (numD_afterC * 100.0 / totalC));
-            //Console.WriteLine("Coop after Def = " + (numC_afterD * 100.0 / totalD));
-            //Console.WriteLine("Def after Def = " + (numD_afterD * 100.0 / totalD));
-            //Console.WriteLine("--------------------------------------------------");
             
             if (totalD != 0)
                 if (numC_afterD*1.0 / totalD > 0.5) return 1;
